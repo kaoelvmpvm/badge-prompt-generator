@@ -4,7 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>徽章機器人產生器</title>
-<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 <style>
 :root{--p:#4f46e5;--p2:#06b6d4;--bg:#f4f7fb;--card:#fff;--text:#24303a;--muted:#667085;--line:#dbe3ed;--ok:#059669;--warn:#b45309;--shadow:0 18px 48px rgba(36,48,58,.11)}
 *{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;font-family:"Microsoft JhengHei","Noto Sans TC",Arial,sans-serif;color:var(--text);line-height:1.6;background:radial-gradient(circle at 10% 8%,rgba(79,70,229,.11),transparent 25%),radial-gradient(circle at 90% 18%,rgba(6,182,212,.12),transparent 22%),linear-gradient(135deg,#f5f7fb,#eef8ff);min-height:100vh}
@@ -129,8 +128,8 @@ input[type=text],textarea,select{width:100%;border:1px solid #cbd5e1;border-radi
       <div class="field"><label>通關密碼</label><input id="password" type="text" placeholder="例如：YES2026" maxlength="12"><div class="small">僅作為活動代碼，不要使用個人帳號密碼或私人資料。</div></div>
       <div class="field full"><label>完成訊息</label><input id="finishMessage" type="text" value="你已完成青春倡議徽章任務！" maxlength="50"><div class="example-line"><b>範例：</b>你已完成青春倡議徽章任務！</div></div>
       <div class="field"><label>產生按鈕文字</label><input id="resultButton" type="text" value="產生提示語" maxlength="12"><div class="example-line"><b>範例：</b>產生提示語</div></div>
-      <div class="field"><label>檔案版本名稱</label><input id="versionName" type="text" value="發表版" maxlength="16"><div class="small">將用於下載的 HTML、PNG 與設定檔名稱。</div></div>
-      <div class="field full"><div class="label">設定保存</div><div class="toolbar"><button class="btn outline" onclick="exportSettings()">下載設定檔</button><button class="btn outline" onclick="document.getElementById('importFile').click()">載入設定檔</button><button class="btn warning" onclick="clearSavedSettings()">清除暫存</button></div><input id="importFile" class="file-input" type="file" accept="application/json,.json" onchange="importSettings(event)"><div class="small">輸入內容會自動暫存在這台裝置的瀏覽器中。</div></div>
+      <div class="field"><label>檔案版本名稱</label><input id="versionName" type="text" value="發表版" maxlength="16"><div class="small">將用於下載的 HTML 與 PNG 檔案名稱。</div></div>
+      <div class="field full"><div class="label">設定保存</div><div class="toolbar"><button class="btn warning" onclick="clearSavedSettings()">清除暫存</button></div><div class="small">輸入內容會自動暫存在這台裝置的瀏覽器中，重新開啟頁面後可繼續編輯。</div></div>
     </div>
     <div class="nav"><button class="btn secondary" onclick="nextPage(3)">上一步</button><button class="btn primary" onclick="generateArtifact()">產生並預覽徽章機器人</button></div>
   </section>
@@ -156,10 +155,9 @@ input[type=text],textarea,select{width:100%;border:1px solid #cbd5e1;border-radi
             <button class="btn success" onclick="copyCode()">複製完整 HTML</button>
             <button class="btn primary" onclick="downloadHTML()">下載 HTML</button>
             <button class="btn outline" onclick="downloadPreviewImage()">下載預覽圖</button>
-            <button class="btn outline" onclick="exportSettings()">下載設定檔</button>
           </div>
           <div class="status" id="status"></div>
-          <div class="note">預覽圖功能會使用網路載入截圖元件；若網路受限制，仍可正常使用預覽、下載 HTML 與複製程式碼。</div>
+          <div class="note">預覽圖會依目前右側的成品畫面產生；若剛切換裝置尺寸或內容，請先按「重新整理預覽」。</div>
         </div>
 
         <div class="panel" style="margin-top:14px">
@@ -281,22 +279,76 @@ function openPreviewWindow(){if(!currentHTML)return;const blob=new Blob([current
 async function copyCode(){if(!currentHTML)currentHTML=buildArtifactHTML(collectSettings());try{await navigator.clipboard.writeText(currentHTML)}catch(e){const t=document.getElementById('output');t.focus();t.select();document.execCommand('copy')}setStatus('完整 HTML 已複製，可貼入 Google Sites 的「嵌入程式碼」。')}
 function downloadHTML(){if(!currentHTML)currentHTML=buildArtifactHTML(collectSettings());downloadBlob(currentHTML,'text/html;charset=utf-8',makeFilename('徽章機器人','html'));setStatus('HTML 檔案已下載。')}
 async function downloadPreviewImage(){
-  if(typeof html2canvas!=='function'){setStatus('截圖元件尚未載入，請確認網路後再試一次。',true);return}
-  const frame=document.getElementById('previewFrame');const doc=frame.contentDocument;
-  if(!doc||!doc.body){setStatus('預覽尚未完成載入，請稍後再試。',true);return}
+  const frame=document.getElementById('previewFrame');
+  const doc=frame.contentDocument;
+  const win=frame.contentWindow;
+  if(!doc||!doc.documentElement||!doc.body||!win){
+    setStatus('預覽尚未完成載入，請稍後再試。',true);
+    return;
+  }
   setStatus('正在製作預覽圖……');
-  const style=doc.createElement('style');style.textContent='*,*::before,*::after{animation:none!important;transition:none!important}';doc.head.appendChild(style);
+  let objectURL='';
   try{
     if(doc.fonts&&doc.fonts.ready)await doc.fonts.ready;
-    const canvas=await html2canvas(doc.body,{scale:2,useCORS:true,backgroundColor:'#ffffff',logging:false,windowWidth:doc.documentElement.scrollWidth,windowHeight:doc.documentElement.scrollHeight});
-    canvas.toBlob(blob=>{if(!blob){setStatus('預覽圖產生失敗。',true);return}const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=makeFilename('預覽圖','png');a.click();URL.revokeObjectURL(url);setStatus('預覽圖已下載。')},'image/png');
-  }catch(err){console.error(err);setStatus('預覽圖產生失敗；仍可下載 HTML 或使用系統截圖。',true)}finally{style.remove()}
+
+    const clone=doc.documentElement.cloneNode(true);
+    clone.setAttribute('xmlns','http://www.w3.org/1999/xhtml');
+    clone.querySelectorAll('script').forEach(el=>el.remove());
+    clone.querySelectorAll('link[rel="preload"],link[rel="modulepreload"]').forEach(el=>el.remove());
+
+    const freeze=doc.createElement('style');
+    freeze.textContent='*,*::before,*::after{animation:none!important;transition:none!important;caret-color:transparent!important}html{scroll-behavior:auto!important}';
+    const clonedHead=clone.querySelector('head');
+    if(clonedHead)clonedHead.appendChild(freeze);
+
+    const width=Math.max(320,Math.ceil(win.innerWidth||doc.documentElement.clientWidth||frame.clientWidth));
+    const height=Math.max(400,Math.ceil(Math.max(doc.body.scrollHeight,doc.documentElement.scrollHeight,win.innerHeight||0)));
+    clone.setAttribute('style',`${clone.getAttribute('style')||''};width:${width}px;min-height:${height}px;background:#fff;`);
+
+    const serialized=new XMLSerializer().serializeToString(clone);
+    const svg=`<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}"><foreignObject width="100%" height="100%">${serialized}</foreignObject></svg>`;
+    const blob=new Blob([svg],{type:'image/svg+xml;charset=utf-8'});
+    objectURL=URL.createObjectURL(blob);
+
+    const image=new Image();
+    await new Promise((resolve,reject)=>{
+      image.onload=resolve;
+      image.onerror=()=>reject(new Error('SVG preview render failed'));
+      image.src=objectURL;
+    });
+
+    const scale=Math.min(2,Math.max(1,window.devicePixelRatio||1));
+    const canvas=document.createElement('canvas');
+    canvas.width=Math.ceil(width*scale);
+    canvas.height=Math.ceil(height*scale);
+    const ctx=canvas.getContext('2d');
+    if(!ctx)throw new Error('Canvas is unavailable');
+    ctx.scale(scale,scale);
+    ctx.fillStyle='#ffffff';
+    ctx.fillRect(0,0,width,height);
+    ctx.drawImage(image,0,0,width,height);
+
+    const pngBlob=await new Promise(resolve=>canvas.toBlob(resolve,'image/png',0.95));
+    if(!pngBlob)throw new Error('PNG conversion failed');
+    const pngURL=URL.createObjectURL(pngBlob);
+    const a=document.createElement('a');
+    a.href=pngURL;
+    a.download=makeFilename('預覽圖','png');
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(()=>URL.revokeObjectURL(pngURL),1500);
+    setStatus('預覽圖已下載。');
+  }catch(err){
+    console.error(err);
+    setStatus('預覽圖產生失敗，請先按「重新整理預覽」後再試一次。',true);
+  }finally{
+    if(objectURL)URL.revokeObjectURL(objectURL);
+  }
 }
 function makeFilename(kind,ext){const d=collectSettings();const base=(d.topicName||'青春倡議').replace(/[\\/:*?"<>|]/g,'_');const version=(d.versionName||'發表版').replace(/[\\/:*?"<>|]/g,'_');return `${base}_${kind}_${version}.${ext}`}
 function downloadBlob(content,type,name){const blob=new Blob([content],{type});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=name;a.click();URL.revokeObjectURL(url)}
 function setStatus(text,isError=false){const el=document.getElementById('status');el.textContent=text;el.style.color=isError?'#b42318':'#059669'}
-function exportSettings(){const data=collectSettings();downloadBlob(JSON.stringify(data,null,2),'application/json;charset=utf-8',makeFilename('設定檔','json'));setStatus('設定檔已下載。')}
-function importSettings(event){const file=event.target.files&&event.target.files[0];if(!file)return;const reader=new FileReader();reader.onload=()=>{try{const data=JSON.parse(reader.result);applySettings(data);saveSettingsNow();setStatus('設定檔已載入。');alert('設定檔載入完成。')}catch(e){alert('設定檔格式無法讀取。')}};reader.readAsText(file,'utf-8');event.target.value=''}
 function bindAutosave(){document.querySelectorAll('input,textarea,select').forEach(el=>el.addEventListener('input',scheduleAutosave));document.addEventListener('change',scheduleAutosave)}
 function scheduleAutosave(){clearTimeout(autosaveTimer);autosaveTimer=setTimeout(saveSettingsNow,350)}
 function saveSettingsNow(){try{localStorage.setItem(STORAGE_KEY,JSON.stringify(collectSettings()))}catch(e){}}
