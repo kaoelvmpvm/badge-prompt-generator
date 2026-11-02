@@ -112,7 +112,7 @@ input[type=text],textarea,select{width:100%;border:1px solid #cbd5e1;border-radi
     <div class="grid">
       <div class="field full"><div class="label">可選風格</div><div class="checkgrid" id="styleGrid"></div></div>
       <div class="field"><div class="label">主色系</div><div class="colors" id="colors"></div><div class="small" id="colorLabel"></div></div>
-      <div class="field"><label>徽章外形</label><select id="shape"><option>圓形徽章</option><option>盾牌徽章</option><option>貼紙徽章</option><option>勳章造型</option><option>六角任務章</option></select></div>
+      <div class="field"><label>徽章外形</label><select id="shape" disabled><option value="圓形徽章">圓形徽章（固定）</option></select><div class="small">依硬性要求，成品外形固定為圓形徽章。</div></div>
       <div class="field full"><div class="label">裝飾元素（最多選 4 個）</div><div class="checkgrid" id="decoGrid"></div></div>
       <div class="field"><label>背景形式</label><select id="background"><option>清爽漸層背景</option><option>簡潔純色背景</option><option>校園插畫背景</option><option>手帳紙張背景</option><option>未來科技背景</option><option>自然療癒背景</option></select></div>
       <div class="field"><label>整體氛圍</label><select id="mood"><option>活潑青春</option><option>溫暖療癒</option><option>熱血激勵</option><option>清楚專業</option><option>冒險任務</option><option>未來科技</option></select></div>
@@ -268,7 +268,7 @@ function basicStep2(){if(lines(val('slogans')).length<1){alert('請至少輸入�
 function basicStep3(){if(checked('style').length<1){alert('請至少選擇一種徽章風格。');return false}return true}
 function collectSettings(){return {
   robotName:val('robotName')||'青春倡議徽章提示語產生器',topicName:val('topicName'),topicAxis:val('topicAxis'),slogans:lines(val('slogans')),subtitle:val('subtitle'),allowCustom:document.getElementById('allowCustom').checked,
-  styles:checked('style').map(name=>({name,desc:styleBank[name]})),color:selectedColor,colorName:document.getElementById('colorLabel').textContent,shape:val('shape'),decorations:checked('deco'),background:val('background'),mood:val('mood'),
+  styles:checked('style').map(name=>({name,desc:styleBank[name]})),color:selectedColor,colorName:document.getElementById('colorLabel').textContent,shape:'圓形徽章',decorations:checked('deco'),background:val('background'),mood:val('mood'),
   passwordLabel:val('passwordLabel')||'通關密碼',password:val('password')||'YES2026',finishMessage:val('finishMessage'),introText:val('introText'),startButton:val('startButton')||'開始製作',resultButton:val('resultButton')||'產生提示語',versionName:val('versionName')||'發表版'
 }}
 function generateArtifact(){if(!basicStep1()||!basicStep2()||!basicStep3())return;const data=collectSettings();currentHTML=buildArtifactHTML(data);document.getElementById('output').value=currentHTML;renderSummary(data);showPage(5);refreshPreview();saveSettingsNow();setStatus('已產生成品，可在右側直接操作。')}
@@ -355,7 +355,7 @@ function saveSettingsNow(){try{localStorage.setItem(STORAGE_KEY,JSON.stringify(c
 function loadSavedSettings(){try{const raw=localStorage.getItem(STORAGE_KEY);if(raw)applySettings(JSON.parse(raw))}catch(e){}}
 function clearSavedSettings(){if(confirm('確定清除這台裝置中暫存的設定嗎？')){localStorage.removeItem(STORAGE_KEY);location.reload()}}
 function applySettings(d){
-  const ids=['robotName','topicName','topicAxis','subtitle','passwordLabel','password','finishMessage','introText','startButton','resultButton','versionName','shape','background','mood'];ids.forEach(id=>{if(d[id]!==undefined&&document.getElementById(id))document.getElementById(id).value=d[id]});
+  const ids=['robotName','topicName','topicAxis','subtitle','passwordLabel','password','finishMessage','introText','startButton','resultButton','versionName','background','mood'];ids.forEach(id=>{if(d[id]!==undefined&&document.getElementById(id))document.getElementById(id).value=d[id]});
   if(Array.isArray(d.slogans))document.getElementById('slogans').value=d.slogans.join('\n');if(typeof d.allowCustom==='boolean')document.getElementById('allowCustom').checked=d.allowCustom;
   document.querySelectorAll('input[name=style]').forEach(x=>x.checked=Array.isArray(d.styles)&&d.styles.some(s=>(typeof s==='string'?s:s.name)===x.value));
   document.querySelectorAll('input[name=deco]').forEach(x=>x.checked=Array.isArray(d.decorations)&&d.decorations.includes(x.value));
@@ -393,7 +393,7 @@ input,textarea{width:100%;padding:11px 12px;border:1px solid #cbd5e1;border-radi
 <section class="card active" id="a1"><h2 id="topic"></h2><p id="intro"></p><div class="summary"><b>主題核心：</b><span id="axis"></span></div><div class="nav"><span></span><button class="btn primary" id="startBtn" onclick="go(2)"></button></div></section>
 <section class="card" id="a2"><h2>選擇標語</h2><p id="sloganHint"></p><div class="options" id="sloganBox"></div><div id="customWrap" style="display:none;margin-top:12px"><input id="customSlogan" maxlength="24" placeholder="請輸入自訂標語"></div><div class="nav"><button class="btn secondary" onclick="go(1)">上一步</button><button class="btn primary" onclick="toStyle()">下一步</button></div></section>
 <section class="card" id="a3"><h2>選擇徽章風格</h2><p>選擇最適合標語的視覺風格。</p><div class="options" id="styleBox"></div><div class="nav"><button class="btn secondary" onclick="go(2)">上一步</button><button class="btn primary" id="resultBtn" onclick="result()"></button></div></section>
-<section class="card" id="a4"><h2>提示語與通關資訊</h2><p class="done" id="finish"></p><div class="summary" id="sum"></div><div class="password" id="passwordBox"></div><textarea id="prompt" readonly></textarea><div class="nav"><button class="btn secondary" onclick="go(3)">上一步</button><div><button class="btn primary" onclick="copyPrompt()">一鍵複製提示語</button><span class="status" id="copyStatus"></span></div></div><div class="nav"><button class="btn secondary" onclick="location.reload()">重新開始</button><a class="btn primary" href="https://gemini.google.com/" target="_blank" rel="noopener">前往 Gemini</a></div></section>
+<section class="card" id="a4"><h2>提示語與通關資訊</h2><p class="hint">使用提示語生成圖片時，請在 Gemini 一併上傳人物照片，AI 才能依照片保留人物形象。</p><p class="done" id="finish"></p><div class="summary" id="sum"></div><div class="password" id="passwordBox"></div><textarea id="prompt" readonly></textarea><div class="nav"><button class="btn secondary" onclick="go(3)">上一步</button><div><button class="btn primary" onclick="copyPrompt()">一鍵複製提示語</button><span class="status" id="copyStatus"></span></div></div><div class="nav"><button class="btn secondary" onclick="location.reload()">重新開始</button><a class="btn primary" href="https://gemini.google.com/" target="_blank" rel="noopener">前往 Gemini</a></div></section>
 </div>
 <script>
 const data=${json};
@@ -405,7 +405,18 @@ function render(){const sb=document.getElementById('sloganBox');data.slogans.for
 function selectSlogan(button,text,isCustom){state.custom=isCustom;state.slogan=text;document.querySelectorAll('#sloganBox .opt').forEach(x=>x.classList.remove('selected'));button.classList.add('selected');if(data.allowCustom){const wrap=document.getElementById('customWrap');wrap.style.display=isCustom?'block':'none';if(isCustom)document.getElementById('customSlogan').focus()}}
 function toStyle(){if(state.custom)state.slogan=document.getElementById('customSlogan').value.trim();if(!state.slogan){alert('請先選擇或輸入標語。');return}go(3)}
 function result(){if(!state.style){alert('請先選擇風格。');return}document.getElementById('sum').innerHTML='<b>標語：</b>'+safe(state.slogan)+'<br><b>風格：</b>'+safe(state.style.name);document.getElementById('prompt').value=buildPrompt();go(4)}
-function buildPrompt(){return '請生成一張「'+data.shape+'」形式的青春倡議徽章。\\n\\n主題：'+data.topicName+'\\n主題核心：'+data.topicAxis+'\\n徽章標語：「'+state.slogan+'」\\n\\n視覺風格：'+state.style.name+'。'+state.style.desc+'\\n整體氛圍：'+data.mood+'。\\n背景：'+data.background+'。\\n主色：'+data.colorName+'（'+data.color+'）。\\n裝飾元素：'+(data.decorations.length?data.decorations.join('、'):'簡潔裝飾')+'。\\n\\n圖片要求：\\n1. 徽章構圖清楚，標語必須完整、清楚、容易閱讀。\\n2. 不要改字、漏字或加入不必要文字。\\n3. 畫面正向、友善，適合校園倡議與成果展示。\\n4. 背景與裝飾不要過度複雜，以免影響標語辨識。\\n5. 不要成人化、性感化、暴露化。\\n6. 不要恐嚇、獵奇、歧視、羞辱、身材比較或外貌嘲笑。\\n7. 不要加入真實品牌、商標或通關密碼。\\n8. 請輸出一張完成度高、可直接用於活動展示的徽章圖像。'}
+function buildPrompt(){
+  const title=data.topicName||data.robotName||'青春倡議';
+  return '請根據我一併上傳的人物照片，生成一張「圓形徽章」形式的青春倡議徽章。\\n\\n'
+    +'【不可省略的硬性要求】\\n'
+    +'(1)一定要清楚出現我上傳照片中的人像，並且讓照片中的人物成為整張圖的主體與視覺焦點。\\n'
+    +'(2)不可以忽略、替換或弱化上傳照片中的人物；若我上傳的是單人照，就以該人物為主角；若我上傳的是多人照，請保留主要人物特徵並讓人物群像成為主體。\\n'
+    +'(3)成品必須是「圓形徽章」構圖，不可做成方形海報、一般插畫或其他版型。\\n'
+    +'(4)圓形徽章的上端必須清楚出現「'+title+'」。\\n\\n'
+    +'主題：'+data.topicName+'\\n主題核心：'+data.topicAxis+'\\n徽章標語：「'+state.slogan+'」\\n\\n'
+    +'視覺風格：'+state.style.name+'。'+state.style.desc+'\\n整體氛圍：'+data.mood+'。\\n背景：'+data.background+'。\\n主色：'+data.colorName+'（'+data.color+'）。\\n裝飾元素：'+(data.decorations.length?data.decorations.join('、'):'簡潔裝飾')+'。\\n\\n'
+    +'圖片要求：\\n1. 徽章構圖清楚，標語必須完整、清楚、容易閱讀。\\n2. 不要改字、漏字或加入不必要文字。\\n3. 畫面正向、友善，適合校園倡議與成果展示。\\n4. 背景與裝飾不要過度複雜，以免影響標語辨識。\\n5. 不要成人化、性感化、暴露化。\\n6. 不要恐嚇、獵奇、歧視、羞辱、身材比較或外貌嘲笑。\\n7. 不要加入真實品牌、商標或通關密碼。\\n8. 請輸出一張完成度高、可直接用於活動展示的徽章圖像。';
+}
 async function copyPrompt(){const t=document.getElementById('prompt');try{await navigator.clipboard.writeText(t.value)}catch(e){t.select();document.execCommand('copy')}document.getElementById('copyStatus').textContent='已複製'}
 init();
 <\/script>
