@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>徽章機器人產生器</title>
+<title>數位媒材小助手</title>
 <style>
 :root{--p:#4f46e5;--p2:#06b6d4;--bg:#f4f7fb;--card:#fff;--text:#24303a;--muted:#667085;--line:#dbe3ed;--ok:#059669;--warn:#b45309;--shadow:0 18px 48px rgba(36,48,58,.11)}
 *{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;font-family:"Microsoft JhengHei","Noto Sans TC",Arial,sans-serif;color:var(--text);line-height:1.6;background:radial-gradient(circle at 10% 8%,rgba(79,70,229,.11),transparent 25%),radial-gradient(circle at 90% 18%,rgba(6,182,212,.12),transparent 22%),linear-gradient(135deg,#f5f7fb,#eef8ff);min-height:100vh}
@@ -34,11 +34,102 @@ input[type=text],textarea,select{width:100%;border:1px solid #cbd5e1;border-radi
 @media(max-width:780px){.grid,.steps,.checkgrid{grid-template-columns:1fr}.full{grid-column:auto}.summary div{grid-template-columns:1fr}.wrap{width:min(100%,calc(100% - 14px));margin:10px auto}.hero,.card{padding:18px}.workspace{display:block}.panel{margin-bottom:14px}.preview-shell{padding:9px}.preview-frame{height:600px}}
 @media(prefers-reduced-motion:reduce){*,*:before,*:after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
 </style>
+<style>
+#media-home[hidden],#media-badge[hidden],#media-quiz[hidden],#media-quiz [hidden]{display:none!important}
+.media-home.hero{max-width:960px;margin:clamp(24px,7vw,84px) auto 0;padding:clamp(20px,4vw,40px)}
+.media-home .media-eyebrow{font-size:.85rem;font-weight:800;color:#4338ca;letter-spacing:.1em}
+.media-home h1{font-size:clamp(2rem,5vw,3.1rem);line-height:1.2;margin:5px 0 9px}
+.media-choices{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin-top:24px}
+.media-choice{display:flex;flex-direction:column;align-items:flex-start;gap:9px;border:1px solid #cdd5ff;border-radius:20px;background:#f4f6ff;padding:clamp(16px,3vw,24px);text-align:left;color:#242d46;cursor:pointer;transition:transform .16s,box-shadow .16s}
+.media-choice-quiz{border-color:#b9e4e7;background:#f1fcfc}
+.media-choice:hover{transform:translateY(-2px);box-shadow:0 10px 23px #24303a18}
+.media-choice:focus-visible,.media-tool-hero button:focus-visible,#media-quiz button:focus-visible{outline:3px solid #4f46e5;outline-offset:3px}
+.media-icon{display:grid;place-items:center;width:47px;height:47px;border-radius:13px;background:#e3e8ff;color:#4338ca}
+.media-choice-quiz .media-icon{background:#d7f3f4;color:#075d68}
+.media-icon svg{width:27px;height:27px}
+.media-choice-name{font-size:clamp(1.12rem,2.5vw,1.42rem);font-weight:800}
+.media-choice-description{color:#52617a;margin-bottom:5px}
+.media-choice-link{margin-top:auto;color:#4338ca;font-weight:800}
+.media-choice-quiz .media-choice-link{color:#075d68}
+.media-tool-hero .media-back{margin-bottom:9px;min-height:44px}
+#media-quiz{max-width:860px}
+.media-quiz-panel{padding:clamp(16px,4vw,28px);background:#fff;border:1px solid #e2e8f0;border-radius:22px;box-shadow:var(--shadow)}
+.media-quiz-heading{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:7px 14px;margin:0 0 14px}
+.media-quiz-heading h2{margin:0;font-size:1.3rem}
+.media-count{margin:0;padding:4px 10px;border-radius:999px;color:#4338ca;background:#eef2ff;font-size:.88rem;font-weight:800}
+.media-form-label{display:block;font-weight:800;margin-bottom:5px}
+#media-question{min-height:85px}
+.media-options{margin:13px 0 0;padding:0;border:0;min-width:0}
+.media-quiz-hint{color:#52617a;margin:4px 0 9px;font-size:.9rem}
+.media-option-row{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:9px;margin:5px 0}
+.media-option-input{display:grid;grid-template-columns:24px minmax(0,1fr);align-items:center;gap:6px;font-weight:800;color:#4338ca}
+.media-option-input input{min-width:0}
+.media-answer-key{display:flex;justify-content:center;align-items:center;gap:6px;min-height:44px;min-width:72px;border-radius:8px;color:#49566d;font-size:.86rem;cursor:pointer;white-space:nowrap}
+.media-answer-key input{width:18px;height:18px;margin:0;accent-color:#4338ca}
+.media-error{color:#9a3328;background:#fff2ef;border-radius:9px;padding:8px 11px;margin:9px 0 0}
+.media-edit-actions{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:8px;margin-top:17px}
+.media-edit-actions .btn,.media-quiz-export .btn{min-height:44px}
+.media-edit-actions .btn:first-child{margin-inline-end:auto}
+#media-quiz .primary{background:linear-gradient(105deg,#4338ca,#126080)}
+.media-quiz-export{margin-top:18px;padding-top:16px;border-top:1px solid #dbe3ed}
+.media-copy-status{margin:0;color:#126346;font-weight:700}
+#media-quiz-code{min-height:115px;font:400 .86rem/1.4 monospace}
+@media(max-width:630px){.media-choices{grid-template-columns:1fr;gap:12px}.media-home.hero::after,.media-tool-hero::after{display:none}.media-answer-key{min-width:60px}.media-option-row{gap:5px}}
+@media(prefers-reduced-motion:reduce){.media-choice{transition:none}}
+</style>
+<style id="media-quiz-widget-style">
+.media-quiz-widget{box-sizing:border-box;color-scheme:light dark;--mq-ink:light-dark(#1d2743,#e9edff);--mq-muted:light-dark(#52617a,#c1cbea);--mq-surface:light-dark(#fff,#1b2440);--mq-option:light-dark(#f8faff,#242e4c);--mq-line:light-dark(#dbe1ef,#4a5876);--mq-accent:light-dark(#4338ca,#c4c0ff);--mq-selected:light-dark(#efedff,#342e63);--mq-good:light-dark(#126346,#a6e9c5);--mq-good-bg:light-dark(#e8f8ef,#1b3c33);--mq-bad:light-dark(#a2342e,#ffc0b7);--mq-bad-bg:light-dark(#fff0ee,#492d36);color:var(--mq-ink,#1d2743);background:var(--mq-surface,#fff);border:1px solid var(--mq-line,#dbe1ef);border-radius:17px;padding:clamp(13px,3vw,22px);max-width:760px;margin:0 auto;font:400 1rem/1.55 system-ui,"Microsoft JhengHei",sans-serif;overflow-wrap:anywhere}
+.media-quiz-widget *{box-sizing:border-box}
+.media-quiz-widget [hidden]{display:none!important}
+.media-quiz-widget .mq-meta{display:flex;gap:6px 12px;flex-wrap:wrap;justify-content:space-between;align-items:center;margin:0 0 10px}
+.media-quiz-widget .mq-chip{display:inline-block;margin:0;padding:3px 10px;border-radius:99px;background:var(--mq-selected,#efedff);color:var(--mq-accent,#4338ca);font-size:.84rem;font-weight:700}
+.media-quiz-widget .mq-help{margin:0;color:var(--mq-muted,#52617a);font-size:.89rem}
+.media-quiz-widget fieldset{border:0;margin:0;padding:0;min-inline-size:0}
+.media-quiz-widget legend{width:100%;margin:0 0 11px;padding:0;font-size:1.13rem;font-weight:750;line-height:1.4;white-space:pre-wrap}
+.media-quiz-widget .mq-options{display:grid;gap:7px}
+.media-quiz-widget .mq-row{display:grid;grid-template-columns:auto auto minmax(0,1fr);align-items:center;gap:9px;min-height:44px;padding:7px 10px;border:1px solid var(--mq-line,#dbe1ef);border-radius:10px;background:var(--mq-option,#f8faff);cursor:pointer}
+.media-quiz-widget .mq-row:has(input:checked){border-color:var(--mq-accent,#4338ca);background:var(--mq-selected,#efedff)}
+.media-quiz-widget .mq-row[data-result=right]{border-color:var(--mq-good,#126346);background:var(--mq-good-bg,#e8f8ef)}
+.media-quiz-widget .mq-row[data-result=wrong]{border-color:var(--mq-bad,#a2342e);background:var(--mq-bad-bg,#fff0ee)}
+.media-quiz-widget .mq-row input{width:17px;height:17px;margin:0;accent-color:var(--mq-accent,#4338ca)}
+.media-quiz-widget .mq-letter{color:var(--mq-accent,#4338ca);font-weight:800}
+.media-quiz-widget .mq-actions{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0 0}
+.media-quiz-widget button{min-height:44px;padding:7px 14px;border:1px solid transparent;border-radius:10px;background:#4338ca;color:#fff;font:inherit;font-weight:700;cursor:pointer}
+.media-quiz-widget button:disabled{opacity:.48;cursor:default}
+.media-quiz-widget button:focus-visible{outline:3px solid var(--mq-accent,#4338ca);outline-offset:2px}
+.media-quiz-widget .mq-result{margin:11px 0 0;padding:8px 10px;border-radius:9px;font-weight:700}
+.media-quiz-widget .mq-result[data-result=right]{background:var(--mq-good-bg,#e8f8ef);color:var(--mq-good,#126346)}
+.media-quiz-widget .mq-result[data-result=wrong]{background:var(--mq-bad-bg,#fff0ee);color:var(--mq-bad,#a2342e)}
+.media-quiz-widget .mq-final-title{margin:0 0 5px;font-size:1.24rem}
+.media-quiz-widget .mq-score{margin:0;color:var(--mq-accent,#4338ca);font-size:1.45rem;font-weight:800}
+</style>
 </head>
 <body>
-<div class="wrap">
-  <section class="hero">
-    <h1>徽章機器人產生器</h1>
+<div class="wrap" id="media-home">
+  <main class="hero media-home" aria-labelledby="media-home-title">
+    <p class="media-eyebrow">教學工具箱</p>
+    <h1 id="media-home-title" tabindex="-1">數位媒材小助手</h1>
+    <p>選擇今天想製作的數位教材。</p>
+    <div class="media-choices">
+      <button class="media-choice media-choice-badge" type="button" data-media-view="badge">
+        <span class="media-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8.5" r="5.5"/><path d="m8 12.7-2 8 6-3 6 3-2-8m-4-6.2v4m-2-2h4"/></svg></span>
+        <span class="media-choice-name">徽章機器人產生器</span>
+        <span class="media-choice-description">設計倡議標語與徽章風格，生成可供學生操作的提示語工具。</span>
+        <span class="media-choice-link">開始製作 <span aria-hidden="true">→</span></span>
+      </button>
+      <button class="media-choice media-choice-quiz" type="button" data-media-view="quiz">
+        <span class="media-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="3"/><path d="m7.5 10 1.5 1.5 3-3m2.5 1.5H17m-9 5h1m3 0h5"/></svg></span>
+        <span class="media-choice-name">選擇題生成器</span>
+        <span class="media-choice-description">逐題輸入題目與選項，可設定多個正解，完成後複製 Google Sites 嵌入碼。</span>
+        <span class="media-choice-link">開始出題 <span aria-hidden="true">→</span></span>
+      </button>
+    </div>
+  </main>
+</div>
+<div class="wrap" id="media-badge" hidden>
+  <section class="hero media-tool-hero">
+    <button class="btn secondary media-back" type="button" data-media-view="home">← 返回工具首頁</button>
+    <h1 id="media-badge-title" tabindex="-1">徽章機器人產生器</h1>
     <p>完成內容設定後，可即時操作成品、切換裝置尺寸、下載預覽圖、下載 HTML，或複製完整程式碼嵌入 Google Sites。</p>
   </section>
 
@@ -178,6 +269,48 @@ input[type=text],textarea,select{width:100%;border:1px solid #cbd5e1;border-radi
             <iframe id="previewFrame" class="preview-frame" title="徽章機器人成品預覽"></iframe>
           </div>
         </div>
+      </div>
+    </div>
+  </section>
+</div>
+<div class="wrap" id="media-quiz" hidden>
+  <section class="hero media-tool-hero">
+    <button class="btn secondary media-back" type="button" data-media-view="home">← 返回工具首頁</button>
+    <h1 id="media-quiz-title" tabindex="-1">選擇題生成器</h1>
+    <p>逐題出題，每題可勾選一個或多個正確答案。</p>
+  </section>
+  <section class="media-quiz-panel" id="media-quiz-edit" aria-labelledby="media-quiz-edit-title">
+    <div class="media-quiz-heading">
+      <h2 id="media-quiz-edit-title">教師編輯區</h2>
+      <p id="media-quiz-position" class="media-count" aria-live="polite"></p>
+    </div>
+    <label for="media-question" class="media-form-label">題目</label>
+    <textarea id="media-question" rows="3" placeholder="輸入這一題的題目"></textarea>
+    <fieldset class="media-options">
+      <legend class="media-form-label">選項與正確答案</legend>
+      <p class="media-quiz-hint">至少填兩個選項。勾選右側的方框，將該選項設為正解。</p>
+      <div id="media-quiz-rows"></div>
+    </fieldset>
+    <p class="media-error" id="media-quiz-error" role="alert" hidden></p>
+    <div class="media-edit-actions">
+      <button class="btn outline" id="media-prev" type="button" hidden>上一題</button>
+      <button class="btn secondary" id="media-next" type="button">下一題</button>
+      <button class="btn primary" id="media-finish" type="button">完成出題</button>
+    </div>
+  </section>
+  <section class="media-quiz-panel" id="media-quiz-preview" aria-labelledby="media-preview-title" hidden>
+    <div class="media-quiz-heading">
+      <h2 id="media-preview-title" tabindex="-1">學生畫面預覽</h2>
+      <button class="btn outline" id="media-edit-again" type="button">返回編輯</button>
+    </div>
+    <div id="media-quiz-play"></div>
+    <div class="media-quiz-export">
+      <button class="btn primary" id="media-quiz-copy" type="button">確認無誤，複製嵌入碼</button>
+      <p class="media-quiz-hint">複製後，貼到 Google Sites 的「插入 → 嵌入 → 嵌入程式碼」。</p>
+      <p id="media-quiz-copy-status" class="media-copy-status" role="status"></p>
+      <div id="media-quiz-code-wrap" hidden>
+        <label for="media-quiz-code" class="media-form-label">Google Sites 嵌入碼</label>
+        <textarea id="media-quiz-code" class="media-quiz-code" rows="5" readonly spellcheck="false"></textarea>
       </div>
     </div>
   </section>
@@ -349,7 +482,7 @@ async function downloadPreviewImage(){
 function makeFilename(kind,ext){const d=collectSettings();const base=(d.topicName||'青春倡議').replace(/[\\/:*?"<>|]/g,'_');const version=(d.versionName||'發表版').replace(/[\\/:*?"<>|]/g,'_');return `${base}_${kind}_${version}.${ext}`}
 function downloadBlob(content,type,name){const blob=new Blob([content],{type});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=name;a.click();URL.revokeObjectURL(url)}
 function setStatus(text,isError=false){const el=document.getElementById('status');el.textContent=text;el.style.color=isError?'#b42318':'#059669'}
-function bindAutosave(){document.querySelectorAll('input,textarea,select').forEach(el=>el.addEventListener('input',scheduleAutosave));document.addEventListener('change',scheduleAutosave)}
+function bindAutosave(){const badge=document.getElementById('media-badge');badge.querySelectorAll('input,textarea,select').forEach(el=>el.addEventListener('input',scheduleAutosave));badge.addEventListener('change',scheduleAutosave)}
 function scheduleAutosave(){clearTimeout(autosaveTimer);autosaveTimer=setTimeout(saveSettingsNow,350)}
 function saveSettingsNow(){try{localStorage.setItem(STORAGE_KEY,JSON.stringify(collectSettings()))}catch(e){}}
 function loadSavedSettings(){try{const raw=localStorage.getItem(STORAGE_KEY);if(raw)applySettings(JSON.parse(raw))}catch(e){}}
@@ -424,6 +557,279 @@ init();
 </html>`;
 }
 init();
+</script>
+<script>
+(() => {
+  'use strict';
+
+  // The preview and exported embed use the same self-contained student runtime.
+  function mountQuiz(root, questions) {
+    const doc = root.ownerDocument;
+    const create = (tag, className, text) => {
+      const node = doc.createElement(tag);
+      if (className) node.className = className;
+      if (text) node.textContent = text;
+      return node;
+    };
+    const button = (text, type = 'button') => {
+      const node = create('button', '', text);
+      node.type = type;
+      return node;
+    };
+    let index = 0;
+    let score = 0;
+
+    function render(focus = false) {
+      const data = questions[index];
+      const meta = create('div', 'mq-meta');
+      const progress = create('p', 'mq-chip', '第 ' + (index + 1) + ' 題／共 ' + questions.length + ' 題');
+      const help = create('p', 'mq-help', '請勾選你認為正確的所有選項。');
+      meta.append(progress, help);
+
+      const form = create('form');
+      const field = create('fieldset');
+      const title = create('legend', '', data.question);
+      const list = create('div', 'mq-options');
+      const rows = data.options.map((option) => {
+        const row = create('label', 'mq-row');
+        const input = create('input');
+        input.type = 'checkbox';
+        row.append(input, create('span', 'mq-letter', option.letter), create('span', '', option.text));
+        list.append(row);
+        return {row, input, option};
+      });
+      field.append(title, list);
+
+      const actions = create('div', 'mq-actions');
+      const submit = button('確認答案', 'submit');
+      submit.disabled = true;
+      const isLast = index === questions.length - 1;
+      const advance = button(isLast ? '查看結果' : '下一題');
+      advance.hidden = true;
+      actions.append(submit, advance);
+      const result = create('p', 'mq-result');
+      result.setAttribute('role', 'status');
+      form.append(field, result, actions);
+
+      form.addEventListener('change', () => {
+        submit.disabled = !rows.some(({input}) => input.checked);
+      });
+      form.addEventListener('submit', (event) => {
+        event.preventDefault();
+        if (fieldsetIsLocked() || !rows.some(({input}) => input.checked)) return;
+        const correct = rows.every(({input, option}) => input.checked === option.correct);
+        if (correct) score++;
+        rows.forEach(({row, input, option}) => {
+          if (option.correct) row.dataset.result = 'right';
+          else if (input.checked) row.dataset.result = 'wrong';
+        });
+        const answer = rows.filter(({option}) => option.correct).map(({option}) => option.letter).join('、');
+        result.dataset.result = correct ? 'right' : 'wrong';
+        result.textContent = correct ? '答對了！' : '答錯了。正確答案是 ' + answer + '。';
+        field.disabled = true;
+        advance.hidden = false;
+        advance.focus();
+        submit.hidden = true;
+      });
+      function fieldsetIsLocked() { return field.disabled; }
+
+      advance.addEventListener('click', () => {
+        if (isLast) showScore();
+        else {
+          index++;
+          render(true);
+        }
+      });
+      root.replaceChildren(meta, form);
+      if (focus) {
+        title.tabIndex = -1;
+        title.focus();
+      }
+    }
+
+    function showScore() {
+      const heading = create('h2', 'mq-final-title', '完成作答');
+      heading.tabIndex = -1;
+      const result = create('p', 'mq-score', '答對 ' + score + ' 題／共 ' + questions.length + ' 題');
+      const actions = create('div', 'mq-actions');
+      const retry = button('再答一次');
+      retry.addEventListener('click', () => {
+        score = 0;
+        index = 0;
+        render(true);
+      });
+      actions.append(retry);
+      root.replaceChildren(heading, result, actions);
+      heading.focus();
+    }
+    root.classList.add('media-quiz-widget');
+    render();
+  }
+
+  const get = (id) => document.getElementById(id);
+  const screens = {home: get('media-home'), badge: get('media-badge'), quiz: get('media-quiz')};
+  const titles = {home: 'media-home-title', badge: 'media-badge-title', quiz: 'media-quiz-title'};
+  function showScreen(name) {
+    Object.entries(screens).forEach(([key, screen]) => { screen.hidden = key !== name; });
+    window.scrollTo(0, 0);
+    get(titles[name]).focus({preventScroll: true});
+  }
+  document.querySelectorAll('[data-media-view]').forEach((button) => {
+    button.addEventListener('click', () => showScreen(button.dataset.mediaView));
+  });
+
+  const editor = get('media-quiz-edit');
+  const preview = get('media-quiz-preview');
+  const question = get('media-question');
+  const position = get('media-quiz-position');
+  const error = get('media-quiz-error');
+  const previous = get('media-prev');
+  const next = get('media-next');
+  const play = get('media-quiz-play');
+  const codeWrap = get('media-quiz-code-wrap');
+  const codeField = get('media-quiz-code');
+  const copyStatus = get('media-quiz-copy-status');
+  const css = get('media-quiz-widget-style').textContent.trim();
+  const letters = ['A', 'B', 'C', 'D'];
+  const blank = () => ({question: '', options: letters.map((letter) => ({letter, text: '', correct: false}))});
+  const drafts = [blank()];
+  let current = 0;
+  let embed = '';
+
+  const fields = letters.map((letter) => {
+    const row = document.createElement('div');
+    row.className = 'media-option-row';
+    const label = document.createElement('label');
+    label.className = 'media-option-input';
+    const prefix = document.createElement('span');
+    prefix.textContent = letter;
+    const input = document.createElement('input');
+    input.type = 'text';
+    input.placeholder = '輸入選項 ' + letter;
+    input.setAttribute('aria-label', '選項 ' + letter);
+    label.append(prefix, input);
+    const key = document.createElement('label');
+    key.className = 'media-answer-key';
+    const check = document.createElement('input');
+    check.type = 'checkbox';
+    check.setAttribute('aria-label', '將 ' + letter + ' 設為正確答案');
+    const hint = document.createElement('span');
+    hint.textContent = '正解';
+    key.append(check, hint);
+    row.append(label, key);
+    get('media-quiz-rows').append(row);
+    return {letter, input, check};
+  });
+
+  function saveCurrent() {
+    drafts[current] = {
+      question: question.value.trim(),
+      options: fields.map(({letter, input, check}) => ({letter, text: input.value.trim(), correct: check.checked}))
+    };
+  }
+  function validation(draft) {
+    if (!draft.question) return '請填入題目。';
+    if (draft.options.filter(({text}) => text).length < 2) return '請至少填寫兩個選項。';
+    if (draft.options.some(({text, correct}) => correct && !text)) return '勾選為正解的選項不能留白。';
+    if (!draft.options.some(({correct}) => correct)) return '請勾選至少一個正確答案。';
+    return '';
+  }
+  function empty(draft) {
+    return !draft.question && draft.options.every(({text, correct}) => !text && !correct);
+  }
+  function showError(text) {
+    error.textContent = text;
+    error.hidden = !text;
+  }
+  function loadQuestion(index, focus = true) {
+    current = index;
+    const draft = drafts[index];
+    position.textContent = '第 ' + (index + 1) + ' 題';
+    question.value = draft.question;
+    fields.forEach(({input, check}, i) => {
+      input.value = draft.options[i].text;
+      check.checked = draft.options[i].correct;
+    });
+    previous.hidden = index === 0;
+    showError('');
+    if (focus) question.focus();
+  }
+
+  editor.addEventListener('input', () => showError(''));
+  previous.addEventListener('click', () => {
+    saveCurrent();
+    if (current > 0) loadQuestion(current - 1);
+  });
+  next.addEventListener('click', () => {
+    saveCurrent();
+    const problem = validation(drafts[current]);
+    // Allow returning to an existing next question while revising a draft.
+    if (current + 1 === drafts.length) {
+      if (problem) {
+        showError(problem);
+        return;
+      }
+      drafts.push(blank());
+    }
+    loadQuestion(current + 1);
+  });
+
+  function buildEmbed(data) {
+    const json = JSON.stringify(data).replace(/</g, '\\u003c').replace(/\u2028/g, '\\u2028').replace(/\u2029/g, '\\u2029');
+    return '<style>\n' + css + '\n</style>\n<div class="media-quiz-widget" lang="zh-Hant"></div>\n'
+      + '<script>\n(' + mountQuiz.toString() + ')(document.currentScript.previousElementSibling, ' + json + ');\n<' + '/script>';
+  }
+
+  get('media-finish').addEventListener('click', () => {
+    saveCurrent();
+    let count = drafts.length;
+    while (count > 1 && empty(drafts[count - 1])) count--;
+    const active = drafts.slice(0, count);
+    const invalid = active.findIndex((draft) => validation(draft));
+    if (invalid !== -1) {
+      const problem = validation(active[invalid]);
+      loadQuestion(invalid);
+      showError('第 ' + (invalid + 1) + ' 題：' + problem);
+      return;
+    }
+    const data = active.map(({question, options}) => ({question, options: options.filter(({text}) => text)}));
+    embed = buildEmbed(data);
+    mountQuiz(play, data);
+    codeWrap.hidden = true;
+    codeField.value = '';
+    copyStatus.textContent = '';
+    editor.hidden = true;
+    preview.hidden = false;
+    window.scrollTo(0, 0);
+    get('media-preview-title').focus({preventScroll: true});
+  });
+
+  get('media-edit-again').addEventListener('click', () => {
+    preview.hidden = true;
+    editor.hidden = false;
+    loadQuestion(current);
+  });
+
+  get('media-quiz-copy').addEventListener('click', async () => {
+    const value = embed;
+    if (!value) return;
+    try {
+      await navigator.clipboard.writeText(value);
+      copyStatus.textContent = '已複製，可貼到 Google Sites。';
+      return;
+    } catch (_) { /* Continue with the selectable code fallback. */ }
+    codeField.value = value;
+    codeWrap.hidden = false;
+    codeField.focus();
+    codeField.select();
+    codeField.setSelectionRange(0, value.length);
+    let copied = false;
+    try { copied = document.execCommand('copy'); } catch (_) { /* Manual copy remains available. */ }
+    copyStatus.textContent = copied ? '已複製，可貼到 Google Sites。' : '已選取嵌入碼，請按 Ctrl+C 或 ⌘+C 複製。';
+  });
+
+  loadQuestion(0, false);
+})();
 </script>
 </body>
 </html>
