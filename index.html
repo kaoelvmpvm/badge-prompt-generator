@@ -9,7 +9,7 @@
 *{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;font-family:"Microsoft JhengHei","Noto Sans TC",Arial,sans-serif;color:var(--text);line-height:1.6;background:radial-gradient(circle at 10% 8%,rgba(79,70,229,.11),transparent 25%),radial-gradient(circle at 90% 18%,rgba(6,182,212,.12),transparent 22%),linear-gradient(135deg,#f5f7fb,#eef8ff);min-height:100vh}
 button,input,textarea,select{font:inherit}.wrap{width:min(1240px,calc(100% - 28px));margin:26px auto 48px}.hero,.card{background:rgba(255,255,255,.95);border:1px solid rgba(255,255,255,.9);border-radius:25px;box-shadow:var(--shadow);backdrop-filter:blur(12px)}
 .hero{position:relative;overflow:hidden;padding:26px;margin-bottom:16px}.hero:after{content:"✨";position:absolute;right:28px;top:18px;font-size:2rem;animation:float 3.4s ease-in-out infinite}.hero h1{margin:0 0 6px;font-size:clamp(1.8rem,4vw,2.5rem)}.hero p{margin:0;color:var(--muted)}
-.steps{display:grid;grid-template-columns:repeat(5,1fr);gap:9px;margin:16px 0}.step{padding:10px;text-align:center;border-radius:999px;background:#fff;color:var(--muted);border:1px solid var(--line);font-size:.92rem;transition:.2s}.step.active{color:#fff;font-weight:800;border-color:transparent;background:linear-gradient(90deg,var(--p),var(--p2));transform:translateY(-2px);box-shadow:0 10px 24px rgba(79,70,229,.18)}
+.steps{display:grid;grid-template-columns:repeat(6,1fr);gap:9px;margin:16px 0}.step{padding:10px;text-align:center;border-radius:999px;background:#fff;color:var(--muted);border:1px solid var(--line);font-size:.92rem;transition:.2s}.step.active{color:#fff;font-weight:800;border-color:transparent;background:linear-gradient(90deg,var(--p),var(--p2));transform:translateY(-2px);box-shadow:0 10px 24px rgba(79,70,229,.18)}
 .card{display:none;position:relative;padding:24px 24px 46px}.card::after{content:"板橋國中 - 高勳頊老師製作";position:absolute;right:18px;bottom:10px;color:rgba(102,112,133,.62);font-size:.72rem;letter-spacing:.03em;pointer-events:none;user-select:none}.card.active{display:block;animation:rise .25s ease}.card h2{margin:0 0 5px}.hint{margin:0 0 18px;color:var(--muted)}
 .grid{display:grid;grid-template-columns:1fr 1fr;gap:15px}.full{grid-column:1/-1}.field{padding:15px;border:1px solid var(--line);border-radius:17px;background:#fbfdff}.field>label,.field>.label{display:block;font-weight:800;margin-bottom:7px}.small{font-size:.88rem;color:var(--muted);margin-top:6px}
 input[type=text],textarea,select{width:100%;border:1px solid #cbd5e1;border-radius:12px;padding:11px 12px;background:#fff;color:var(--text)}textarea{min-height:112px;resize:vertical}input:focus,textarea:focus,select:focus{outline:none;border-color:var(--p);box-shadow:0 0 0 3px rgba(79,70,229,.1)}
@@ -74,6 +74,12 @@ input[type=text],textarea,select{width:100%;border:1px solid #cbd5e1;border-radi
 .media-quiz-export{margin-top:18px;padding-top:16px;border-top:1px solid #dbe3ed}
 .media-copy-status{margin:0;color:#126346;font-weight:700}
 #media-quiz-code{min-height:115px;font:400 .86rem/1.4 monospace}
+#badgeWordwallScore,#media-pass-score{width:min(100%,180px);border:1px solid #cbd5e1;border-radius:11px;padding:9px 12px;color:var(--text);background:#fff}
+#badgeWordwallEmbed{min-height:100px}
+#badgeWordwallError[hidden]{display:none}
+.badge-game-fields{display:grid;gap:13px}
+.media-feedback-field+.media-feedback-field{margin-top:15px}
+#media-fail-feedback{min-height:91px}
 @media(max-width:630px){.media-choices{grid-template-columns:1fr;gap:12px}.media-home.hero::after,.media-tool-hero::after{display:none}.media-answer-key{min-width:60px}.media-option-row{gap:5px}}
 @media(prefers-reduced-motion:reduce){.media-choice{transition:none}}
 </style>
@@ -102,6 +108,10 @@ input[type=text],textarea,select{width:100%;border:1px solid #cbd5e1;border-radi
 .media-quiz-widget .mq-result[data-result=wrong]{background:var(--mq-bad-bg,#fff0ee);color:var(--mq-bad,#a2342e)}
 .media-quiz-widget .mq-final-title{margin:0 0 5px;font-size:1.24rem}
 .media-quiz-widget .mq-score{margin:0;color:var(--mq-accent,#4338ca);font-size:1.45rem;font-weight:800}
+.media-quiz-widget .mq-final-state{margin:11px 0 0;font-weight:750}
+.media-quiz-widget .mq-final-state[data-state=pass]{color:var(--mq-good,#126346)}
+.media-quiz-widget .mq-final-state[data-state=fail]{color:var(--mq-bad,#a2342e)}
+.media-quiz-widget .mq-feedback{margin:6px 0 0;padding:10px 12px;border-radius:10px;background:var(--mq-bad-bg,#fff0ee);color:var(--mq-bad,#a2342e);white-space:pre-wrap}
 </style>
 </head>
 <body>
@@ -134,14 +144,34 @@ input[type=text],textarea,select{width:100%;border:1px solid #cbd5e1;border-radi
   </section>
 
   <div class="steps">
-    <div class="step active" id="s1">1 首頁設計</div>
+    <div class="step active" id="s0">前置 Wordwall 闖關</div>
+    <div class="step" id="s1">1 首頁設計</div>
     <div class="step" id="s2">2 標語設計</div>
     <div class="step" id="s3">3 風格設計</div>
     <div class="step" id="s4">4 結算畫面</div>
     <div class="step" id="s5">5 成果預覽及 HTML</div>
   </div>
 
-  <section class="card active" id="p1">
+  <section class="card active" id="p0">
+    <h2>前置關卡：Wordwall 遊戲</h2>
+    <p class="hint">選填。加上遊戲後，學生須先輸入達標分數，才能開始製作徽章。若不需要遊戲，兩個欄位留白即可。</p>
+    <div class="badge-game-fields">
+      <div class="field compact">
+        <label for="badgeWordwallEmbed">Wordwall 遊戲嵌入碼</label>
+        <textarea id="badgeWordwallEmbed" rows="3" placeholder="貼上 Wordwall 提供的 iframe 嵌入碼"></textarea>
+        <p class="small">在 Wordwall 的「嵌入」選擇 IFrame，複製程式碼後貼在這裡。也可直接貼上 iframe 的 Wordwall 嵌入網址。</p>
+      </div>
+      <div class="field compact">
+        <label for="badgeWordwallScore">過關分數</label>
+        <input id="badgeWordwallScore" type="number" min="1" step="1" inputmode="numeric" placeholder="例如 8" aria-describedby="badgeWordwallHelp">
+        <p class="small" id="badgeWordwallHelp">用遊戲結算畫面的分數單位設定。Wordwall 不會直接把分數傳給這個工具，因此由學生照結算畫面自行輸入。</p>
+      </div>
+    </div>
+    <p class="media-error" id="badgeWordwallError" role="alert" hidden></p>
+    <div class="nav"><span></span><button class="btn primary" type="button" onclick="nextPage(1)">下一步：首頁設計</button></div>
+  </section>
+
+  <section class="card" id="p1">
     <h2>第一區：首頁設計</h2>
     <p class="hint">在左側輸入首頁內容，右側會同步呈現實際版面。</p>
     <div class="home-editor">
@@ -167,7 +197,7 @@ input[type=text],textarea,select{width:100%;border:1px solid #cbd5e1;border-radi
         </div>
       </aside>
     </div>
-    <div class="nav"><span></span><button class="btn primary" onclick="nextPage(2)">下一步：設計標語</button></div>
+    <div class="nav"><button class="btn secondary" type="button" onclick="nextPage(0)">上一步</button><button class="btn primary" onclick="nextPage(2)">下一步：設計標語</button></div>
   </section>
 
   <section class="card" id="p2">
@@ -298,10 +328,31 @@ input[type=text],textarea,select{width:100%;border:1px solid #cbd5e1;border-radi
       <button class="btn primary" id="media-finish" type="button">完成出題</button>
     </div>
   </section>
+  <section class="media-quiz-panel" id="media-quiz-feedback" aria-labelledby="media-feedback-title" hidden>
+    <div class="media-quiz-heading">
+      <h2 id="media-feedback-title" tabindex="-1">過關分數與回饋</h2>
+      <p id="media-quiz-total" class="media-count"></p>
+    </div>
+    <div class="media-feedback-field">
+      <label for="media-pass-score" class="media-form-label">過關分數</label>
+      <input id="media-pass-score" type="number" min="1" step="1" inputmode="numeric" placeholder="選填" aria-describedby="media-score-help">
+      <p id="media-score-help" class="media-quiz-hint">每答對一題得 1 分，達到設定的分數即過關。留白則只顯示成績。</p>
+    </div>
+    <div class="media-feedback-field">
+      <label for="media-fail-feedback" class="media-form-label">未過關回饋訊息</label>
+      <textarea id="media-fail-feedback" rows="3" placeholder="例如：請回看教材，想想自己容易混淆的觀念，再試一次。" aria-describedby="media-feedback-help"></textarea>
+      <p id="media-feedback-help" class="media-quiz-hint">只有未達過關分數時才會顯示。留白則顯示預設訊息。</p>
+    </div>
+    <p class="media-error" id="media-feedback-error" role="alert" hidden></p>
+    <div class="media-edit-actions">
+      <button class="btn outline" id="media-edit-questions" type="button">返回修改題目</button>
+      <button class="btn primary" id="media-preview-quiz" type="button">產生學生預覽</button>
+    </div>
+  </section>
   <section class="media-quiz-panel" id="media-quiz-preview" aria-labelledby="media-preview-title" hidden>
     <div class="media-quiz-heading">
       <h2 id="media-preview-title" tabindex="-1">學生畫面預覽</h2>
-      <button class="btn outline" id="media-edit-again" type="button">返回編輯</button>
+      <button class="btn outline" id="media-edit-again" type="button">返回回饋設定</button>
     </div>
     <div id="media-quiz-play"></div>
     <div class="media-quiz-export">
@@ -345,6 +396,9 @@ function init(){
   bindAutosave();
   bindHomePreview();
   bindSloganPreview();
+  for(const id of ['badgeWordwallEmbed','badgeWordwallScore']){
+    document.getElementById(id).addEventListener('input',()=>setWordwallError(''));
+  }
   loadSavedSettings();
   updateHomePreview();
   updateSloganPreview();
@@ -394,17 +448,52 @@ function bindSloganPreview(){
 }
 
 function checked(name){return [...document.querySelectorAll(`input[name=${name}]:checked`)].map(x=>x.value)}
-function nextPage(n){if(n===2&&!basicStep1())return;if(n===3&&!basicStep2())return;if(n===4&&!basicStep3())return;showPage(n)}
-function showPage(n){for(let i=1;i<=5;i++){document.getElementById('p'+i).classList.toggle('active',i===n);document.getElementById('s'+i).classList.toggle('active',i===n)}window.scrollTo({top:0,behavior:'smooth'})}
+function nextPage(n){if(n===1&&!basicWordwall())return;if(n===2&&!basicStep1())return;if(n===3&&!basicStep2())return;if(n===4&&!basicStep3())return;showPage(n)}
+function showPage(n){for(let i=0;i<=5;i++){document.getElementById('p'+i).classList.toggle('active',i===n);document.getElementById('s'+i).classList.toggle('active',i===n)}window.scrollTo({top:0,behavior:'smooth'})}
+function wordwallURL(input){
+  let source=input.trim();
+  if(source.startsWith('<')){
+    const template=document.createElement('template');
+    template.innerHTML=source;
+    const frames=template.content.querySelectorAll('iframe[src]');
+    if(frames.length!==1)return '';
+    source=frames[0].getAttribute('src').trim();
+  }
+  if(source.startsWith('//'))source='https:'+source;
+  try{
+    const url=new URL(source);
+    if(url.protocol!=='https:'||!['wordwall.net','www.wordwall.net'].includes(url.hostname)||url.username||url.password||url.port)return '';
+    if(!/^\/(?:[a-z]{2}(?:-[a-z]{2})?\/)?(?:embed|play)\/[a-z0-9-]+(?:\/[a-z0-9-]+)*\/?$/i.test(url.pathname))return '';
+    return url.href;
+  }catch(_){return ''}
+}
+function setWordwallError(message){
+  const error=document.getElementById('badgeWordwallError');
+  error.textContent=message;
+  error.hidden=!message;
+}
+function basicWordwall(){
+  const embed=val('badgeWordwallEmbed');
+  const score=val('badgeWordwallScore');
+  const scoreInput=document.getElementById('badgeWordwallScore');
+  let message='';
+  if(!embed&&(score||scoreInput.validity.badInput))message='請先貼上 Wordwall 遊戲的 iframe 嵌入碼，或將過關分數留白。';
+  else if(embed&&!wordwallURL(embed))message='找不到有效的 Wordwall 遊戲嵌入網址。請貼上 Wordwall 提供的 IFrame 嵌入碼。';
+  else if(embed&&(!/^\d+$/.test(score)||!Number.isSafeInteger(Number(score))||Number(score)<1))message='請設定大於 0 的整數作為過關分數。';
+  setWordwallError(message);
+  if(message)showPage(0);
+  return !message;
+}
 function basicStep1(){if(!val('robotName')||!val('topicName')||!val('topicAxis')){alert('請先完成首頁中的機器人名稱、主題名稱與核心概念。');return false}return true}
 function basicStep2(){if(lines(val('slogans')).length<1){alert('請至少輸入一句推薦標語。');return false}return true}
 function basicStep3(){if(checked('style').length<1){alert('請至少選擇一種徽章風格。');return false}return true}
 function collectSettings(){return {
+  badgeWordwallEmbed:val('badgeWordwallEmbed'),badgeWordwallScore:val('badgeWordwallScore'),
   robotName:val('robotName')||'青春倡議徽章提示語產生器',topicName:val('topicName'),topicAxis:val('topicAxis'),slogans:lines(val('slogans')),subtitle:val('subtitle'),allowCustom:document.getElementById('allowCustom').checked,
   styles:checked('style').map(name=>({name,desc:styleBank[name]})),color:selectedColor,colorName:document.getElementById('colorLabel').textContent,shape:'圓形徽章',decorations:checked('deco'),background:val('background'),mood:val('mood'),
   passwordLabel:val('passwordLabel')||'通關密碼',password:val('password')||'YES2026',finishMessage:val('finishMessage'),introText:val('introText'),startButton:val('startButton')||'開始製作',resultButton:val('resultButton')||'產生提示語',versionName:val('versionName')||'發表版'
 }}
-function generateArtifact(){if(!basicStep1()||!basicStep2()||!basicStep3())return;const data=collectSettings();currentHTML=buildArtifactHTML(data);document.getElementById('output').value=currentHTML;renderSummary(data);showPage(5);refreshPreview();saveSettingsNow();setStatus('已產生成品，可在右側直接操作。')}
+function generateArtifact(){if(!basicWordwall()||!basicStep1()||!basicStep2()||!basicStep3())return;const data=collectSettings();currentHTML=buildArtifactHTML(data);document.getElementById('output').value=currentHTML;renderSummary(data);showPage(5);refreshPreview();saveSettingsNow();setStatus('已產生成品，可在右側直接操作。')}
 function renderSummary(d){document.getElementById('summary').innerHTML=`<div><b>機器人名稱</b><span>${escapeHTML(d.robotName)}</span></div><div><b>主題</b><span>${escapeHTML(d.topicName)}</span></div><div><b>推薦標語</b><span>${d.slogans.length} 句</span></div><div><b>可選風格</b><span>${d.styles.length} 種</span></div><div><b>主色系</b><span>${escapeHTML(d.colorName)}</span></div><div><b>版本</b><span>${escapeHTML(d.versionName)}</span></div>`}
 function refreshPreview(){if(!currentHTML)currentHTML=buildArtifactHTML(collectSettings());const frame=document.getElementById('previewFrame');frame.srcdoc=currentHTML;setStatus('預覽已更新。')}
 function setDevice(device,button){const wrap=document.getElementById('previewWrap');wrap.className='preview-frame-wrap '+device;document.querySelectorAll('.device-btn').forEach(x=>x.classList.remove('active'));button.classList.add('active')}
@@ -488,7 +577,7 @@ function saveSettingsNow(){try{localStorage.setItem(STORAGE_KEY,JSON.stringify(c
 function loadSavedSettings(){try{const raw=localStorage.getItem(STORAGE_KEY);if(raw)applySettings(JSON.parse(raw))}catch(e){}}
 function clearSavedSettings(){if(confirm('確定清除這台裝置中暫存的設定嗎？')){localStorage.removeItem(STORAGE_KEY);location.reload()}}
 function applySettings(d){
-  const ids=['robotName','topicName','topicAxis','subtitle','passwordLabel','password','finishMessage','introText','startButton','resultButton','versionName','background','mood'];ids.forEach(id=>{if(d[id]!==undefined&&document.getElementById(id))document.getElementById(id).value=d[id]});
+  const ids=['badgeWordwallEmbed','badgeWordwallScore','robotName','topicName','topicAxis','subtitle','passwordLabel','password','finishMessage','introText','startButton','resultButton','versionName','background','mood'];ids.forEach(id=>{if(d[id]!==undefined&&document.getElementById(id))document.getElementById(id).value=d[id]});
   if(Array.isArray(d.slogans))document.getElementById('slogans').value=d.slogans.join('\n');if(typeof d.allowCustom==='boolean')document.getElementById('allowCustom').checked=d.allowCustom;
   document.querySelectorAll('input[name=style]').forEach(x=>x.checked=Array.isArray(d.styles)&&d.styles.some(s=>(typeof s==='string'?s:s.name)===x.value));
   document.querySelectorAll('input[name=deco]').forEach(x=>x.checked=Array.isArray(d.decorations)&&d.decorations.includes(x.value));
@@ -500,7 +589,11 @@ function escapeHTML(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;',
 function safeJSON(obj){return JSON.stringify(obj).replace(/</g,'\\u003c').replace(/>/g,'\\u003e').replace(/&/g,'\\u0026')}
 
 function buildArtifactHTML(data){
-const json=safeJSON(data);
+const {badgeWordwallEmbed,badgeWordwallScore,...settings}=data;
+const gameURL=wordwallURL(badgeWordwallEmbed||'');
+const minimum=Number(badgeWordwallScore);
+const game=gameURL&&Number.isSafeInteger(minimum)&&minimum>0?{url:gameURL,minimum}:null;
+const json=safeJSON({...settings,game});
 return `<!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
@@ -512,9 +605,17 @@ return `<!DOCTYPE html>
 *{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;min-height:100vh;font-family:"Microsoft JhengHei","Noto Sans TC",Arial,sans-serif;color:var(--text);line-height:1.65;background:radial-gradient(circle at 10% 10%,color-mix(in srgb,var(--p) 20%,transparent),transparent 25%),radial-gradient(circle at 90% 18%,rgba(6,182,212,.18),transparent 22%),linear-gradient(135deg,#f4f8ff,#f8fbff);overflow-x:hidden}
 body:before,body:after{content:"";position:fixed;border-radius:999px;pointer-events:none;z-index:-1;filter:blur(4px)}body:before{width:260px;height:260px;left:-80px;top:8vh;background:color-mix(in srgb,var(--p) 18%,transparent);animation:floatA 9s ease-in-out infinite}body:after{width:220px;height:220px;right:-70px;bottom:8vh;background:rgba(6,182,212,.16);animation:floatB 11s ease-in-out infinite}
 .wrap{width:min(920px,calc(100% - 24px));margin:24px auto}.hero,.card{background:var(--card);border:1px solid #fff;border-radius:24px;box-shadow:0 18px 45px rgba(38,50,59,.10);backdrop-filter:blur(10px)}.hero{position:relative;overflow:hidden;padding:25px;margin-bottom:14px;animation:riseIn .5s ease both}.hero:after{content:"✨";position:absolute;right:24px;top:18px;font-size:1.8rem;animation:floatA 3.6s ease-in-out infinite}.hero h1{margin:0 0 7px}.hero p{margin:0;color:var(--muted)}
-.progress{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:14px 0}.pill{padding:9px;text-align:center;border-radius:999px;background:#fff;color:var(--muted);border:1px solid var(--line);transition:.22s}.pill.active{background:linear-gradient(90deg,var(--p),var(--p2));color:#fff;font-weight:800;transform:translateY(-2px);box-shadow:0 10px 22px color-mix(in srgb,var(--p) 20%,transparent)}
+.progress{display:grid;grid-template-columns:repeat(var(--badge-steps,4),minmax(0,1fr));gap:8px;margin:14px 0}.pill{padding:9px;text-align:center;border-radius:999px;background:#fff;color:var(--muted);border:1px solid var(--line);transition:.22s}.pill.active{background:linear-gradient(90deg,var(--p),var(--p2));color:#fff;font-weight:800;transform:translateY(-2px);box-shadow:0 10px 22px color-mix(in srgb,var(--p) 20%,transparent)}
 .card{display:none;padding:23px}.card.active{display:block;animation:riseIn .32s ease both}.options{display:grid;gap:10px}.opt{position:relative;overflow:hidden;padding:14px;border:2px solid #e2e8f0;border-radius:15px;background:#fff;text-align:left;cursor:pointer;font:inherit;transition:.18s}.opt:hover{transform:translateY(-3px);border-color:color-mix(in srgb,var(--p) 55%,#fff);box-shadow:0 12px 25px color-mix(in srgb,var(--p) 13%,transparent)}.opt.selected{border-color:var(--p);background:#f8fbff;transform:translateY(-2px);box-shadow:0 12px 26px color-mix(in srgb,var(--p) 18%,transparent)}.opt b{display:block}.opt span{font-size:.9rem;color:var(--muted)}
 input,textarea{width:100%;padding:11px 12px;border:1px solid #cbd5e1;border-radius:12px;font:inherit}input:focus,textarea:focus{outline:none;border-color:var(--p);box-shadow:0 0 0 4px color-mix(in srgb,var(--p) 11%,transparent)}textarea{min-height:280px;resize:vertical}.nav{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-top:18px}.ai-links{display:flex;flex-wrap:wrap;gap:10px}.btn{position:relative;overflow:hidden;border:0;border-radius:12px;padding:11px 16px;font:inherit;font-weight:800;cursor:pointer;transition:.18s;text-decoration:none;display:inline-flex;align-items:center;justify-content:center}.btn:hover{transform:translateY(-2px);box-shadow:0 11px 24px rgba(38,50,59,.13)}.primary{background:linear-gradient(90deg,var(--p),var(--p2));color:#fff}.secondary{background:#eef2f7;color:var(--text)}.summary{padding:14px;border-radius:14px;background:#f8fafc;border:1px solid #e2e8f0;margin-bottom:14px}.password{padding:14px;border-radius:14px;background:#fff7d6;border:1px solid #f1cf67;font-size:1.18rem;font-weight:900;color:#7c4a00;margin:12px 0;animation:pulseGlow 2s ease-in-out infinite}.done{font-weight:900;color:#047857}.status{display:inline-block;margin-left:8px;color:#047857;font-weight:800}
+.wordwall-card.active{animation:none}
+.wordwall-card h2{margin-top:0}
+.wordwall-game{display:block;width:100%;height:clamp(340px,53vw,500px);border:1px solid var(--line);border-radius:12px;background:#f8fafc}
+.wordwall-help{color:var(--muted)}
+.wordwall-check{display:flex;align-items:end;flex-wrap:wrap;gap:9px;margin:13px 0 0}
+.wordwall-check label{display:grid;gap:3px;font-weight:750}
+.wordwall-check input{width:150px}
+.wordwall-error{color:#9f3026;font-weight:750;margin-bottom:0}
 @keyframes floatA{0%,100%{transform:translate(0,0) rotate(0)}50%{transform:translate(24px,26px) rotate(8deg)}}@keyframes floatB{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(-22px,-20px) scale(1.08)}}@keyframes riseIn{from{opacity:0;transform:translateY(14px) scale(.985)}to{opacity:1;transform:translateY(0) scale(1)}}@keyframes pulseGlow{0%,100%{box-shadow:0 0 0 0 transparent}50%{box-shadow:0 0 0 9px color-mix(in srgb,var(--p) 12%,transparent)}}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}@media(max-width:700px){.progress{grid-template-columns:1fr}.wrap{width:min(100%,calc(100% - 14px));margin:10px auto}.hero,.card{padding:17px}.hero:after{right:14px;top:12px}.ai-links{width:100%}.ai-links .btn{flex:1;min-width:130px}}
 </style>
@@ -522,18 +623,39 @@ input,textarea{width:100%;padding:11px 12px;border:1px solid #cbd5e1;border-radi
 <body>
 <div class="wrap">
 <section class="hero"><h1 id="title"></h1><p id="subtitle"></p></section>
-<div class="progress"><div class="pill active" id="q1">1 功能說明</div><div class="pill" id="q2">2 選標語</div><div class="pill" id="q3">3 選風格</div><div class="pill" id="q4">4 提示語與密碼</div></div>
-<section class="card active" id="a1"><h2 id="topic"></h2><p id="intro"></p><div class="summary"><b>主題核心：</b><span id="axis"></span></div><div class="nav"><span></span><button class="btn primary" id="startBtn" onclick="go(2)"></button></div></section>
+<div class="progress"${game?' style="--badge-steps:5"':''}>${game?'<div class="pill active" id="q0">闖關遊戲</div>':''}<div class="pill${game?'':' active'}" id="q1">1 功能說明</div><div class="pill" id="q2">2 選標語</div><div class="pill" id="q3">3 選風格</div><div class="pill" id="q4">4 提示語與密碼</div></div>
+${game?'<section class="card wordwall-card active" id="a0"><h2>先挑戰 Wordwall 遊戲</h2><p>本關須達 <strong>'+game.minimum+' 分</strong>才能開始製作徽章。</p><iframe class="wordwall-game" id="wordwall-game" title="Wordwall 闖關遊戲" src="'+escapeHTML(game.url)+'" allowfullscreen></iframe><p class="wordwall-help">遊戲結束後，請依畫面顯示的實際得分填寫。<a href="'+escapeHTML(game.url)+'" target="_blank" rel="noopener noreferrer">遊戲無法載入？另開視窗</a></p><div class="wordwall-check" id="wordwall-check"><label for="wordwall-score">遊戲得分<input type="number" id="wordwall-score" min="0" step="1" inputmode="numeric" required></label><button class="btn primary" id="wordwall-verify" type="button">驗證分數並繼續</button></div><p id="wordwall-error" class="wordwall-error" role="alert" hidden></p></section>':''}
+<section class="card${game?'':' active'}" id="a1"><h2 id="topic"></h2><p id="intro"></p><div class="summary"><b>主題核心：</b><span id="axis"></span></div><div class="nav"><span></span><button class="btn primary" id="startBtn" onclick="go(2)"></button></div></section>
 <section class="card" id="a2"><h2>選擇標語</h2><p id="sloganHint"></p><div class="options" id="sloganBox"></div><div id="customWrap" style="display:none;margin-top:12px"><input id="customSlogan" maxlength="24" placeholder="請輸入自訂標語"></div><div class="nav"><button class="btn secondary" onclick="go(1)">上一步</button><button class="btn primary" onclick="toStyle()">下一步</button></div></section>
 <section class="card" id="a3"><h2>選擇徽章風格</h2><p>選擇最適合標語的視覺風格。</p><div class="options" id="styleBox"></div><div class="nav"><button class="btn secondary" onclick="go(2)">上一步</button><button class="btn primary" id="resultBtn" onclick="result()"></button></div></section>
 <section class="card" id="a4"><h2>提示語與通關資訊</h2><p class="hint">使用提示語生成圖片時，請在 ChatGPT 或 Gemini 一併上傳人物照片，AI 才能依照片保留人物形象。</p><p class="done" id="finish"></p><div class="summary" id="sum"></div><div class="password" id="passwordBox"></div><textarea id="prompt" readonly></textarea><div class="nav"><button class="btn secondary" onclick="go(3)">上一步</button><div><button class="btn primary" onclick="copyPrompt()">一鍵複製提示語</button><span class="status" id="copyStatus"></span></div></div><div class="nav"><button class="btn secondary" onclick="location.reload()">重新開始</button><div class="ai-links"><a class="btn primary" href="https://chatgpt.com/" target="_blank" rel="noopener noreferrer">前往 ChatGPT</a><a class="btn primary" href="https://gemini.google.com/" target="_blank" rel="noopener noreferrer">前往 Gemini</a></div></div></section>
 </div>
 <script>
 const data=${json};
-const state={slogan:'',style:null,custom:false};
+const state={slogan:'',style:null,custom:false,gamePassed:!data.game};
 function safe(s){return String(s??'').replace(/[&<>\"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;'}[c]))}
-function go(n){for(let i=1;i<=4;i++){document.getElementById('a'+i).classList.toggle('active',i===n);document.getElementById('q'+i).classList.toggle('active',i===n)}scrollTo({top:0,behavior:'smooth'})}
-function init(){document.getElementById('title').textContent=data.robotName;document.getElementById('subtitle').textContent=data.subtitle;document.getElementById('topic').textContent=data.topicName;document.getElementById('intro').textContent=data.introText;document.getElementById('axis').textContent=data.topicAxis;document.getElementById('startBtn').textContent=data.startButton;document.getElementById('resultBtn').textContent=data.resultButton;document.getElementById('finish').textContent=data.finishMessage;document.getElementById('passwordBox').textContent=data.passwordLabel+'：'+data.password;document.getElementById('sloganHint').textContent=data.allowCustom?'請選擇一則推薦標語，或自行輸入標語。':'請選擇一則推薦標語。';render()}
+function go(n){if(n>0&&!state.gamePassed)return;for(let i=data.game?0:1;i<=4;i++){document.getElementById('a'+i).classList.toggle('active',i===n);document.getElementById('q'+i).classList.toggle('active',i===n)}scrollTo({top:0,behavior:'smooth'})}
+function initWordwall(){
+  const form=document.getElementById('wordwall-check');
+  if(!form)return;
+  const score=document.getElementById('wordwall-score');
+  const error=document.getElementById('wordwall-error');
+  score.addEventListener('input',()=>{error.hidden=true});
+  const verify=()=>{
+    const points=score.valueAsNumber;
+    if(!Number.isSafeInteger(points)||points<data.game.minimum){
+      error.textContent='尚未過關。請在遊戲中再挑戰一次，達到 '+data.game.minimum+' 分後再輸入。';
+      error.hidden=false;
+      return;
+    }
+    state.gamePassed=true;
+    go(1);
+    document.getElementById('startBtn').focus();
+  };
+  document.getElementById('wordwall-verify').addEventListener('click',verify);
+  score.addEventListener('keydown',event=>{if(event.key==='Enter'){event.preventDefault();verify()}});
+}
+function init(){initWordwall();document.getElementById('title').textContent=data.robotName;document.getElementById('subtitle').textContent=data.subtitle;document.getElementById('topic').textContent=data.topicName;document.getElementById('intro').textContent=data.introText;document.getElementById('axis').textContent=data.topicAxis;document.getElementById('startBtn').textContent=data.startButton;document.getElementById('resultBtn').textContent=data.resultButton;document.getElementById('finish').textContent=data.finishMessage;document.getElementById('passwordBox').textContent=data.passwordLabel+'：'+data.password;document.getElementById('sloganHint').textContent=data.allowCustom?'請選擇一則推薦標語，或自行輸入標語。':'請選擇一則推薦標語。';render()}
 function render(){const sb=document.getElementById('sloganBox');data.slogans.forEach(s=>{const b=document.createElement('button');b.className='opt';b.innerHTML='<b>'+safe(s)+'</b>';b.onclick=()=>selectSlogan(b,s,false);sb.appendChild(b)});if(data.allowCustom){const c=document.createElement('button');c.className='opt';c.innerHTML='<b>自訂標語</b><span>自行輸入想放在徽章上的文字</span>';c.onclick=()=>selectSlogan(c,'',true);sb.appendChild(c)}else document.getElementById('customWrap').remove();const st=document.getElementById('styleBox');data.styles.forEach(s=>{const b=document.createElement('button');b.className='opt';b.innerHTML='<b>'+safe(s.name)+'</b><span>'+safe(s.desc)+'</span>';b.onclick=()=>{state.style=s;document.querySelectorAll('#styleBox .opt').forEach(x=>x.classList.remove('selected'));b.classList.add('selected')};st.appendChild(b)})}
 function selectSlogan(button,text,isCustom){state.custom=isCustom;state.slogan=text;document.querySelectorAll('#sloganBox .opt').forEach(x=>x.classList.remove('selected'));button.classList.add('selected');if(data.allowCustom){const wrap=document.getElementById('customWrap');wrap.style.display=isCustom?'block':'none';if(isCustom)document.getElementById('customSlogan').focus()}}
 function toStyle(){if(state.custom)state.slogan=document.getElementById('customSlogan').value.trim();if(!state.slogan){alert('請先選擇或輸入標語。');return}go(3)}
@@ -563,7 +685,7 @@ init();
   'use strict';
 
   // The preview and exported embed use the same self-contained student runtime.
-  function mountQuiz(root, questions) {
+  function mountQuiz(root, {questions, passingScore, failFeedback}) {
     const doc = root.ownerDocument;
     const create = (tag, className, text) => {
       const node = doc.createElement(tag);
@@ -659,7 +781,15 @@ init();
         render(true);
       });
       actions.append(retry);
-      root.replaceChildren(heading, result, actions);
+      const content = [heading, result];
+      if (passingScore !== null) {
+        const passed = score >= passingScore;
+        const state = create('p', 'mq-final-state', (passed ? '已過關' : '未過關') + '・過關分數 ' + passingScore + ' 分');
+        state.dataset.state = passed ? 'pass' : 'fail';
+        content.push(state);
+        if (!passed) content.push(create('p', 'mq-feedback', failFeedback));
+      }
+      root.replaceChildren(...content, actions);
       heading.focus();
     }
     root.classList.add('media-quiz-widget');
@@ -679,7 +809,11 @@ init();
   });
 
   const editor = get('media-quiz-edit');
+  const feedback = get('media-quiz-feedback');
   const preview = get('media-quiz-preview');
+  const threshold = get('media-pass-score');
+  const failMessage = get('media-fail-feedback');
+  const feedbackError = get('media-feedback-error');
   const question = get('media-question');
   const position = get('media-quiz-position');
   const error = get('media-quiz-error');
@@ -695,6 +829,7 @@ init();
   const drafts = [blank()];
   let current = 0;
   let embed = '';
+  let finishedQuestions = [];
 
   const fields = letters.map((letter) => {
     const row = document.createElement('div');
@@ -792,13 +927,49 @@ init();
       showError('第 ' + (invalid + 1) + ' 題：' + problem);
       return;
     }
-    const data = active.map(({question, options}) => ({question, options: options.filter(({text}) => text)}));
+    finishedQuestions = active.map(({question, options}) => ({question, options: options.filter(({text}) => text)}));
+    threshold.max = finishedQuestions.length;
+    get('media-quiz-total').textContent = '共 ' + finishedQuestions.length + ' 題／滿分 ' + finishedQuestions.length + ' 分';
+    feedbackError.hidden = true;
+    editor.hidden = true;
+    feedback.hidden = false;
+    window.scrollTo(0, 0);
+    get('media-feedback-title').focus({preventScroll: true});
+  });
+
+  get('media-edit-questions').addEventListener('click', () => {
+    feedback.hidden = true;
+    editor.hidden = false;
+    loadQuestion(current);
+  });
+  feedback.addEventListener('input', () => { feedbackError.hidden = true; });
+
+  get('media-preview-quiz').addEventListener('click', () => {
+    const raw = threshold.value.trim();
+    const points = Number(raw);
+    if (threshold.validity.badInput || (raw && (!/^\d+$/.test(raw) || points < 1 || points > finishedQuestions.length))) {
+      feedbackError.textContent = '請輸入 1 到 ' + finishedQuestions.length + ' 之間的整數，或將過關分數留白。';
+      feedbackError.hidden = false;
+      threshold.focus();
+      return;
+    }
+    if (!raw && failMessage.value.trim()) {
+      feedbackError.textContent = '已填寫未過關回饋，請一併設定過關分數。';
+      feedbackError.hidden = false;
+      threshold.focus();
+      return;
+    }
+    const data = {
+      questions: finishedQuestions,
+      passingScore: raw ? points : null,
+      failFeedback: failMessage.value.trim() || '還沒達到過關分數。可以回顧教材，再挑戰一次！'
+    };
     embed = buildEmbed(data);
     mountQuiz(play, data);
     codeWrap.hidden = true;
     codeField.value = '';
     copyStatus.textContent = '';
-    editor.hidden = true;
+    feedback.hidden = true;
     preview.hidden = false;
     window.scrollTo(0, 0);
     get('media-preview-title').focus({preventScroll: true});
@@ -806,8 +977,8 @@ init();
 
   get('media-edit-again').addEventListener('click', () => {
     preview.hidden = true;
-    editor.hidden = false;
-    loadQuestion(current);
+    feedback.hidden = false;
+    get('media-feedback-title').focus();
   });
 
   get('media-quiz-copy').addEventListener('click', async () => {
