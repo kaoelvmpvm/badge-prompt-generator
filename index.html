@@ -624,7 +624,7 @@ input,textarea{width:100%;padding:11px 12px;border:1px solid #cbd5e1;border-radi
 <div class="wrap">
 <section class="hero"><h1 id="title"></h1><p id="subtitle"></p></section>
 <div class="progress"${game?' style="--badge-steps:5"':''}>${game?'<div class="pill active" id="q0">闖關遊戲</div>':''}<div class="pill${game?'':' active'}" id="q1">1 功能說明</div><div class="pill" id="q2">2 選標語</div><div class="pill" id="q3">3 選風格</div><div class="pill" id="q4">4 提示語與密碼</div></div>
-${game?'<section class="card wordwall-card active" id="a0"><h2>先挑戰 Wordwall 遊戲</h2><p>本關須達 <strong>'+game.minimum+' 分</strong>才能開始製作徽章。</p><iframe class="wordwall-game" id="wordwall-game" title="Wordwall 闖關遊戲" src="'+escapeHTML(game.url)+'" allowfullscreen></iframe><p class="wordwall-help">遊戲結束後，請依畫面顯示的實際得分填寫。<a href="'+escapeHTML(game.url)+'" target="_blank" rel="noopener noreferrer">遊戲無法載入？另開視窗</a></p><div class="wordwall-check" id="wordwall-check"><label for="wordwall-score">遊戲得分<input type="number" id="wordwall-score" min="0" step="1" inputmode="numeric" required></label><button class="btn primary" id="wordwall-verify" type="button">驗證分數並繼續</button></div><p id="wordwall-error" class="wordwall-error" role="alert" hidden></p></section>':''}
+${game?'<section class="card wordwall-card active" id="a0"><h2>先挑戰 Wordwall 遊戲</h2><iframe class="wordwall-game" id="wordwall-game" title="Wordwall 闖關遊戲" src="'+escapeHTML(game.url)+'" allowfullscreen></iframe><p class="wordwall-help">遊戲結束後，請依畫面顯示的實際得分填寫。<a href="'+escapeHTML(game.url)+'" target="_blank" rel="noopener noreferrer">遊戲無法載入？另開視窗</a></p><div class="wordwall-check" id="wordwall-check"><label for="wordwall-score">遊戲得分<input type="number" id="wordwall-score" min="0" step="1" inputmode="numeric" required></label><button class="btn primary" id="wordwall-verify" type="button">驗證分數並繼續</button></div><p id="wordwall-error" class="wordwall-error" role="alert" hidden></p></section>':''}
 <section class="card${game?'':' active'}" id="a1"><h2 id="topic"></h2><p id="intro"></p><div class="summary"><b>主題核心：</b><span id="axis"></span></div><div class="nav"><span></span><button class="btn primary" id="startBtn" onclick="go(2)"></button></div></section>
 <section class="card" id="a2"><h2>選擇標語</h2><p id="sloganHint"></p><div class="options" id="sloganBox"></div><div id="customWrap" style="display:none;margin-top:12px"><input id="customSlogan" maxlength="24" placeholder="請輸入自訂標語"></div><div class="nav"><button class="btn secondary" onclick="go(1)">上一步</button><button class="btn primary" onclick="toStyle()">下一步</button></div></section>
 <section class="card" id="a3"><h2>選擇徽章風格</h2><p>選擇最適合標語的視覺風格。</p><div class="options" id="styleBox"></div><div class="nav"><button class="btn secondary" onclick="go(2)">上一步</button><button class="btn primary" id="resultBtn" onclick="result()"></button></div></section>
@@ -644,7 +644,7 @@ function initWordwall(){
   const verify=()=>{
     const points=score.valueAsNumber;
     if(!Number.isSafeInteger(points)||points<data.game.minimum){
-      error.textContent='尚未過關。請在遊戲中再挑戰一次，達到 '+data.game.minimum+' 分後再輸入。';
+      error.textContent='尚未過關。請再挑戰一次，並重新輸入遊戲得分。';
       error.hidden=false;
       return;
     }
